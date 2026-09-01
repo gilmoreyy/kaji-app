@@ -1,6 +1,7 @@
+import './src/config/env.js'
+
 import express from 'express'
 import cors from 'cors'
-import dotenv from 'dotenv'
 
 import authRoutes from './src/routes/auth.routes.js'
 import siswaRoutes from './src/routes/siswa.routes.js'
@@ -8,8 +9,6 @@ import babRoutes from './src/routes/bab.routes.js'
 import dashboardRoutes from './src/routes/dashboard.routes.js'
 import configRoutes from './src/routes/config.routes.js'
 import jadwalRoutes from './src/routes/jadwal.routes.js'
-
-dotenv.config()
 
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled rejection (server tetap jalan):', err)
@@ -38,6 +37,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Terjadi kesalahan pada server' })
 })
 
-app.listen(port, () => {
-  console.log(`Backend running on http://localhost:${port}`)
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Backend running on port ${port}`)
 })
