@@ -1,0 +1,60 @@
+:root {
+  --color-primary: #2f60b3;
+  --color-primary-hover: #285298;
+  --color-primary-dark: #1b2452;
+  --color-bg-app: #f4f5f7;
+  --color-bg-sidebar: #f4f5f7;
+  --color-white: #ffffff;
+  --color-border: #e2e4e9;
+  --color-text: #1f2430;
+  --color-text-muted: #6b7280;
+  --color-text-faint: #9aa1af;
+  --color-green: #22b14c;
+  --color-yellow: #f5c518;
+  --color-red: #ef4444;
+  --color-cell-empty: #c3cbe6;
+  --color-badge: #ef4444;
+
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  font: 15px/1.45 system-ui, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
+  color: var(--color-text);
+  background: var(--color-bg-app);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}

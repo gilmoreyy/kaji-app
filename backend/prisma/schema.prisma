@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tutor {
+  id_tutor      String  @id @default(uuid())
+  nama          String
+  email         String  @unique
+  kata_sandi    String
+  username      String? @unique
+  display_name  String?
+  no_hp         String?
+  gender        String?
+  siswa         Siswa[]
+}
+
+model Siswa {
+  id_siswa           String   @id @default(uuid())
+  nama                String
+  jenjang             String
+  asal_sekolah        String
+  universitas_tujuan  String
+  email               String?
+  no_hp               String?
+  jurusan             String?
+  sisa_sesi           Int      @default(0)
+  id_tutor            String
+  tutor               Tutor    @relation(fields: [id_tutor], references: [id_tutor], onDelete: Cascade)
+
+  progres      Progres_Siswa[]
+  jadwal       Jadwal_Pertemuan[]
+  rekomendasi  Rekomendasi[]
+}
+
+model Bab {
+  id_bab      Int    @id @default(autoincrement())
+  nama_bab    String
+  urutan_bab  Int    @unique
+  ringkasan   String @default("")
+
+  progres      Progres_Siswa[]
+  rekomendasi  Rekomendasi[]
+  jadwal       Jadwal_Pertemuan[]
+}
+
+model Progres_Siswa {
+  id_progres      String   @id @default(uuid())
+  id_siswa        String
+  id_bab          Int
+  skor_bab        Float
+  tanggal_update  DateTime @updatedAt
+
+  siswa  Siswa  @relation(fields: [id_siswa], references: [id_siswa], onDelete: Cascade)
+  bab    Bab    @relation(fields: [id_bab], references: [id_bab], onDelete: Cascade)
+
+  @@unique([id_siswa, id_bab])
+}
+
+model Jadwal_Pertemuan {
+  id_jadwal              String    @id @default(uuid())
+  id_siswa               String
+  tanggal_pertemuan      DateTime  @db.Date
+  waktu_pertemuan        String
+  id_bab                 Int?
+  skor                   Float?
+  catatan                String?
+  assignment_nama_file   String?
+  assignment_path        String?
+
+  siswa  Siswa  @relation(fields: [id_siswa], references: [id_siswa], onDelete: Cascade)
+  bab    Bab?   @relation(fields: [id_bab], references: [id_bab])
+}
+
+model Rekomendasi {
+  id_rekomendasi      String   @id @default(uuid())
+  id_siswa            String
+  id_bab              Int
+  skor_prioritas      Float
+  tanggal_dihasilkan  DateTime @default(now())
+
+  siswa  Siswa  @relation(fields: [id_siswa], references: [id_siswa], onDelete: Cascade)
+  bab    Bab    @relation(fields: [id_bab], references: [id_bab], onDelete: Cascade)
+}

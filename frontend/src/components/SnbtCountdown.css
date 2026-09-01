@@ -1,0 +1,31 @@
+.snbt-countdown {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.snbt-countdown-boxes {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.snbt-box {
+  background: var(--color-primary-dark);
+  border-radius: 6px;
+  padding: 4px 7px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 22px;
+  text-align: center;
+}
+
+.snbt-colon {
+  font-weight: 700;
+}

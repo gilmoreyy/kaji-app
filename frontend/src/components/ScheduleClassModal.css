@@ -1,0 +1,86 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 20, 40, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-card {
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.modal-card h2 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.modal-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.modal-card input,
+.modal-card select {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 9px 10px;
+  font-size: 14px;
+}
+
+.modal-error {
+  color: var(--color-red);
+  font-size: 13px;
+  margin: 0;
+}
+
+.modal-empty {
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.modal-cancel,
+.modal-submit {
+  flex: 1;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.modal-cancel {
+  background: var(--color-bg-app);
+  color: var(--color-text);
+}
+
+.modal-submit {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.modal-submit:disabled {
+  opacity: 0.6;
+}

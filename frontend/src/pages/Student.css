@@ -1,0 +1,17 @@
+.student-page {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.student-main {
+  flex: 2 1 400px;
+  min-width: 0;
+}
+
+.student-error,
+.student-empty {
+  color: var(--color-text-muted);
+  padding: 24px;
+}

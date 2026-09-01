@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Environment variables (berisi DATABASE_URL, JWT_SECRET, dll — JANGAN pernah di-commit)
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# Uploaded files (PDF modul/assignment) — data lokal, bukan source code
+backend/uploads/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor files
+.DS_Store
+Thumbs.db

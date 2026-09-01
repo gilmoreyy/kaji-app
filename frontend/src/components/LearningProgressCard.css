@@ -1,0 +1,74 @@
+.learning-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.learning-card h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+
+.learning-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.learning-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.learning-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-primary);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.learning-bar-track {
+  flex: 1;
+  height: 10px;
+  border-radius: 6px;
+  background: var(--color-bg-app);
+  overflow: hidden;
+}
+
+.learning-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+}
+
+.learning-bar-fill.green {
+  background: var(--color-green);
+}
+
+.learning-bar-fill.yellow {
+  background: var(--color-yellow);
+}
+
+.learning-bar-fill.red {
+  background: var(--color-red);
+}
+
+.learning-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-left: 44px;
+  font-size: 11px;
+  color: var(--color-text-faint);
+}
