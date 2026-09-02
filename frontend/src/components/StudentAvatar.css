@@ -1,0 +1,18 @@
+.student-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.student-avatar-photo {
+  object-fit: cover;
+}
+
+.student-avatar-placeholder {
+  background: var(--color-primary);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

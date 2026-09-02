@@ -1,14 +1,7 @@
 import { Fragment } from 'react'
 import { TOTAL_COLUMNS, LEGEND_SYMBOLS, statusForSkor } from '../constants/topics'
+import StudentAvatar from './StudentAvatar'
 import './ProgressGrid.css'
-
-function initials(nama) {
-  return nama
-    .split(' ')
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('')
-}
 
 export default function ProgressGrid({ siswaProgress }) {
   const babCount = siswaProgress[0]?.progres.length ?? 0
@@ -24,7 +17,12 @@ export default function ProgressGrid({ siswaProgress }) {
             <div className="progress-divider" />
             {siswaProgress.map((s) => (
               <Fragment key={s.id_siswa}>
-                <div className="progress-avatar">{initials(s.nama)}</div>
+                <StudentAvatar
+                  foto_profil={s.foto_profil}
+                  nama={s.nama}
+                  size={44}
+                  className="progress-avatar"
+                />
                 <div className="progress-cells">
                   {s.progres.map((p) => (
                     <span

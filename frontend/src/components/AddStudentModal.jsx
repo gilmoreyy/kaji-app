@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { apiFetch } from '../api/client'
+import StudentAvatar from './StudentAvatar'
 import './ScheduleClassModal.css'
 
 const JENJANG_OPTIONS = ['Kelas 10', 'Kelas 11', 'Kelas 12', 'Gap Year']
@@ -14,8 +15,17 @@ export default function AddStudentModal({ onClose, onCreated }) {
     email: '',
     no_hp: '',
   })
+  const [foto, setFoto] = useState(null)
+  const [fotoPreview, setFotoPreview] = useState(null)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  function handleFotoChange(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setFoto(file)
+    setFotoPreview(URL.createObjectURL(file))
+  }
 
   function set(field) {
     return (e) => setForm((f) => ({ ...f, [field]: e.target.value }))
@@ -27,6 +37,11 @@ export default function AddStudentModal({ onClose, onCreated }) {
     setSubmitting(true)
     try {
       const created = await apiFetch('/siswa', { method: 'POST', body: form })
+      if (foto) {
+        const body = new FormData()
+        body.append('foto', foto)
+        await apiFetch(`/siswa/${created.id_siswa}/foto`, { method: 'POST', body })
+      }
       onCreated(created.id_siswa)
     } catch (err) {
       setError(err.message)
@@ -41,6 +56,25 @@ export default function AddStudentModal({ onClose, onCreated }) {
         <h2>Add Student</h2>
 
         <form onSubmit={handleSubmit}>
+          <label className="add-student-foto-label">
+            Foto Profil
+            <div className="add-student-foto-row">
+              {fotoPreview ? (
+                <img src={fotoPreview} alt="Preview" className="add-student-foto-preview" />
+              ) : (
+                <StudentAvatar foto_profil={null} nama={form.nama || '?'} size={56} />
+              )}
+              <label className="add-student-foto-btn">
+                Pilih Foto
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  hidden
+                  onChange={handleFotoChange}
+                />
+              </label>
+            </div>
+          </label>
           <label>
             Nama
             <input value={form.nama} onChange={set('nama')} required />

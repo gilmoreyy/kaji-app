@@ -28,6 +28,7 @@ export async function overview(req, res) {
       id_siswa: s.id_siswa,
       nama: s.nama,
       jenjang: s.jenjang,
+      foto_profil: s.foto_profil,
       progres: babList.map((bab) => ({
         id_bab: bab.id_bab,
         urutan_bab: bab.urutan_bab,

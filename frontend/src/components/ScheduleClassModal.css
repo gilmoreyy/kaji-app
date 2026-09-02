@@ -44,6 +44,30 @@
   font-size: 14px;
 }
 
+.add-student-foto-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.add-student-foto-preview {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.add-student-foto-btn {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
 .modal-error {
   color: var(--color-red);
   font-size: 13px;

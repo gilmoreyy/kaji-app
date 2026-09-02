@@ -1,4 +1,9 @@
 const TOKEN_KEY = 'kaji_token'
+const API_BASE = import.meta.env.VITE_API_URL ?? ''
+
+export function assetUrl(path) {
+  return path ? `${API_BASE}/${path}` : null
+}
 
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY)
@@ -12,7 +17,7 @@ export function setToken(token) {
 export async function apiFetch(path, options = {}) {
   const token = getToken()
   const isFormData = options.body instanceof FormData
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}/api${path}`, {
     ...options,
     headers: {
       ...(isFormData ? {} : { 'Content-Type': 'application/json' }),

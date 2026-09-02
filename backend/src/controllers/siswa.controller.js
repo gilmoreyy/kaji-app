@@ -1,4 +1,28 @@
+import fs from 'fs'
+import path from 'path'
+import multer from 'multer'
 import prisma from '../config/db.js'
+
+const UPLOAD_DIR = 'uploads/siswa'
+fs.mkdirSync(UPLOAD_DIR, { recursive: true })
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: UPLOAD_DIR,
+    filename: (req, file, cb) => {
+      cb(null, `${req.params.id}-${Date.now()}${path.extname(file.originalname)}`)
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) {
+      return cb(new Error('Foto harus berformat JPG, PNG, atau WEBP'))
+    }
+    cb(null, true)
+  },
+})
+
+export const uploadFotoMiddleware = upload.single('foto')
 
 async function assertOwnership(id_siswa, id_tutor) {
   const siswa = await prisma.siswa.findUnique({ where: { id_siswa } })
@@ -72,6 +96,23 @@ export async function update(req, res) {
   const updated = await prisma.siswa.update({
     where: { id_siswa: siswa.id_siswa },
     data: { nama, jenjang, asal_sekolah, universitas_tujuan, email, no_hp, jurusan, sisa_sesi },
+  })
+  res.json(updated)
+}
+
+export async function uploadFoto(req, res) {
+  const siswa = await assertOwnership(req.params.id, req.tutor.id_tutor)
+  if (!siswa) return res.status(404).json({ message: 'Siswa tidak ditemukan' })
+
+  if (!req.file) return res.status(400).json({ message: 'Foto wajib diunggah' })
+
+  if (siswa.foto_profil) {
+    fs.unlink(siswa.foto_profil, () => {})
+  }
+
+  const updated = await prisma.siswa.update({
+    where: { id_siswa: siswa.id_siswa },
+    data: { foto_profil: req.file.path.split(path.sep).join('/') },
   })
   res.json(updated)
 }

@@ -17,7 +17,18 @@ process.on('unhandledRejection', (err) => {
 const app = express()
 const port = process.env.PORT || 3001
 
-app.use(cors())
+// FRONTEND_URL boleh diisi beberapa origin dipisah koma (mis. domain production +
+// http://localhost:5173 untuk dev). *.vercel.app otomatis diizinkan juga supaya
+// preview deployment Vercel (subdomain acak tiap deploy) tidak perlu didaftarkan manual.
+const allowedOrigins = process.env.FRONTEND_URL?.split(',').map((origin) => origin.trim())
+
+function corsOrigin(origin, callback) {
+  if (!origin || !allowedOrigins) return callback(null, true)
+  const allowed = allowedOrigins.includes(origin) || /^https:\/\/[\w-]+\.vercel\.app$/.test(origin)
+  callback(null, allowed)
+}
+
+app.use(cors({ origin: corsOrigin }))
 app.use(express.json())
 app.use('/uploads', express.static('uploads'))
 

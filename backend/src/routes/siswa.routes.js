@@ -7,6 +7,8 @@ import {
   remove,
   getProgres,
   upsertProgres,
+  uploadFoto,
+  uploadFotoMiddleware,
 } from '../controllers/siswa.controller.js'
 import {
   listBySiswa as listJadwalBySiswa,
@@ -28,6 +30,7 @@ router.post('/', asyncHandler(create))
 router.get('/:id', asyncHandler(detail))
 router.put('/:id', asyncHandler(update))
 router.delete('/:id', asyncHandler(remove))
+router.post('/:id/foto', uploadFotoMiddleware, asyncHandler(uploadFoto))
 
 router.get('/:id/progres', asyncHandler(getProgres))
 router.put('/:id/progres/:id_bab', asyncHandler(upsertProgres))

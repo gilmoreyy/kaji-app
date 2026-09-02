@@ -28,6 +28,7 @@ model Siswa {
   email               String?
   no_hp               String?
   jurusan             String?
+  foto_profil         String?
   sisa_sesi           Int      @default(0)
   id_tutor            String
   tutor               Tutor    @relation(fields: [id_tutor], references: [id_tutor], onDelete: Cascade)

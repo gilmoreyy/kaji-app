@@ -1,12 +1,5 @@
+import StudentAvatar from './StudentAvatar'
 import './StudentListPanel.css'
-
-function initials(nama) {
-  return nama
-    .split(' ')
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('')
-}
 
 export default function StudentListPanel({ siswaList, selectedId, onSelect, onAddClick }) {
   return (
@@ -24,7 +17,12 @@ export default function StudentListPanel({ siswaList, selectedId, onSelect, onAd
             className={`student-list-item${s.id_siswa === selectedId ? ' active' : ''}`}
             onClick={() => onSelect(s.id_siswa)}
           >
-            <div className="student-list-avatar">{initials(s.nama)}</div>
+            <StudentAvatar
+              foto_profil={s.foto_profil}
+              nama={s.nama}
+              size={36}
+              className="student-list-avatar"
+            />
             <div className="student-list-info">
               <div className="student-list-nama">{s.nama}</div>
               <div className="student-list-sekolah">{s.asal_sekolah}</div>

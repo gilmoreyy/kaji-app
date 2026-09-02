@@ -18,18 +18,32 @@
   align-items: flex-start;
 }
 
-.profile-avatar {
-  width: 64px;
-  height: 64px;
+.profile-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-avatar-edit {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--color-primary);
   color: var(--color-white);
-  font-size: 20px;
-  font-weight: 700;
+  border: 2px solid var(--color-white);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+}
+
+.profile-avatar-edit:hover {
+  background: var(--color-primary-hover);
+}
+
+.profile-avatar-edit:disabled {
+  opacity: 0.6;
 }
 
 .profile-fields {

@@ -1,20 +1,15 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { apiFetch } from '../api/client'
+import StudentAvatar from './StudentAvatar'
 import './StudentProfileCard.css'
-
-function initials(nama) {
-  return nama
-    .split(' ')
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('')
-}
 
 export default function StudentProfileCard({ siswa, onUpdated }) {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState(toForm(siswa))
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [uploadingFoto, setUploadingFoto] = useState(false)
+  const fileInputRef = useRef(null)
 
   function toForm(s) {
     return {
@@ -52,6 +47,25 @@ export default function StudentProfileCard({ siswa, onUpdated }) {
     }
   }
 
+  async function handleFotoChange(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+
+    setError('')
+    setUploadingFoto(true)
+    try {
+      const body = new FormData()
+      body.append('foto', file)
+      await apiFetch(`/siswa/${siswa.id_siswa}/foto`, { method: 'POST', body })
+      onUpdated()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setUploadingFoto(false)
+    }
+  }
+
   return (
     <div className="profile-card">
       <div className="profile-header">
@@ -59,9 +73,28 @@ export default function StudentProfileCard({ siswa, onUpdated }) {
       </div>
 
       <div className="profile-body">
-        <div className="profile-avatar">{initials(siswa.nama)}</div>
+        <div className="profile-avatar-wrap">
+          <StudentAvatar foto_profil={siswa.foto_profil} nama={siswa.nama} size={64} className="profile-avatar" />
+          <button
+            type="button"
+            className="profile-avatar-edit"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingFoto}
+            title="Ganti foto"
+          >
+            <CameraIcon />
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            hidden
+            onChange={handleFotoChange}
+          />
+        </div>
 
         <div className="profile-fields">
+          {!editing && error && <p className="profile-error">{error}</p>}
           {editing ? (
             <form onSubmit={handleSave} className="profile-form">
               <div className="profile-form-grid">
@@ -132,5 +165,19 @@ export default function StudentProfileCard({ siswa, onUpdated }) {
         </div>
       </div>
     </div>
+  )
+}
+
+function CameraIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="13" r="3.2" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
   )
 }
