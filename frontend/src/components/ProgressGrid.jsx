@@ -18,7 +18,8 @@ export default function ProgressGrid({ siswaProgress }) {
             {siswaProgress.map((s) => (
               <Fragment key={s.id_siswa}>
                 <StudentAvatar
-                  foto_profil={s.foto_profil}
+                  id_siswa={s.id_siswa}
+                  foto_profil_mimetype={s.foto_profil_mimetype}
                   nama={s.nama}
                   size={44}
                   className="progress-avatar"

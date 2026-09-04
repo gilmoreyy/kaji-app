@@ -1,8 +1,12 @@
 const TOKEN_KEY = 'kaji_token'
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
-export function assetUrl(path) {
-  return path ? `${API_BASE}/${path}` : null
+export function siswaFotoUrl(id_siswa) {
+  return `${API_BASE}/api/siswa/${id_siswa}/foto`
+}
+
+export function assignmentFileUrl(id_siswa, id_jadwal) {
+  return `${API_BASE}/api/siswa/${id_siswa}/jadwal/${id_jadwal}/assignment`
 }
 
 export function getToken() {

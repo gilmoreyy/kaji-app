@@ -1,20 +1,10 @@
-import fs from 'fs'
-import path from 'path'
 import multer from 'multer'
 import prisma from '../config/db.js'
 import { assertOwnership } from './siswa.controller.js'
 import { generateRekomendasi } from '../services/recommendation.service.js'
 
-const UPLOAD_DIR = 'uploads/assignment'
-fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: UPLOAD_DIR,
-    filename: (req, file, cb) => {
-      cb(null, `${req.params.id_jadwal}-${Date.now()}${path.extname(file.originalname)}`)
-    },
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (file.mimetype !== 'application/pdf') {
@@ -132,18 +122,28 @@ export async function uploadAssignment(req, res) {
 
   if (!req.file) return res.status(400).json({ message: 'File PDF wajib diunggah' })
 
-  if (jadwal.assignment_path) {
-    fs.unlink(jadwal.assignment_path, () => {})
-  }
-
   const updated = await prisma.jadwal_Pertemuan.update({
     where: { id_jadwal: jadwal.id_jadwal },
     data: {
       assignment_nama_file: req.file.originalname,
-      assignment_path: req.file.path,
+      assignment_data: req.file.buffer,
     },
   })
   res.json(updated)
+}
+
+export async function getAssignmentFile(req, res) {
+  const jadwal = await prisma.jadwal_Pertemuan.findUnique({
+    where: { id_jadwal: req.params.id_jadwal },
+    select: { id_siswa: true, assignment_data: true, assignment_nama_file: true },
+  })
+  if (!jadwal || jadwal.id_siswa !== req.params.id || !jadwal.assignment_data) {
+    return res.status(404).end()
+  }
+
+  res.set('Content-Type', 'application/pdf')
+  res.set('Content-Disposition', `inline; filename="${jadwal.assignment_nama_file}"`)
+  res.send(Buffer.from(jadwal.assignment_data))
 }
 
 export async function listAll(req, res) {

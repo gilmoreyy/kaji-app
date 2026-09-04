@@ -28,7 +28,8 @@ model Siswa {
   email               String?
   no_hp               String?
   jurusan             String?
-  foto_profil         String?
+  foto_profil_data      Bytes?
+  foto_profil_mimetype  String?
   sisa_sesi           Int      @default(0)
   id_tutor            String
   tutor               Tutor    @relation(fields: [id_tutor], references: [id_tutor], onDelete: Cascade)
@@ -71,7 +72,7 @@ model Jadwal_Pertemuan {
   skor                   Float?
   catatan                String?
   assignment_nama_file   String?
-  assignment_path        String?
+  assignment_data        Bytes?
 
   siswa  Siswa  @relation(fields: [id_siswa], references: [id_siswa], onDelete: Cascade)
   bab    Bab?   @relation(fields: [id_bab], references: [id_bab])

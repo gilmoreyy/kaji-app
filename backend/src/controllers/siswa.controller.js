@@ -1,18 +1,8 @@
-import fs from 'fs'
-import path from 'path'
 import multer from 'multer'
 import prisma from '../config/db.js'
 
-const UPLOAD_DIR = 'uploads/siswa'
-fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: UPLOAD_DIR,
-    filename: (req, file, cb) => {
-      cb(null, `${req.params.id}-${Date.now()}${path.extname(file.originalname)}`)
-    },
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) {
@@ -106,15 +96,22 @@ export async function uploadFoto(req, res) {
 
   if (!req.file) return res.status(400).json({ message: 'Foto wajib diunggah' })
 
-  if (siswa.foto_profil) {
-    fs.unlink(siswa.foto_profil, () => {})
-  }
-
   const updated = await prisma.siswa.update({
     where: { id_siswa: siswa.id_siswa },
-    data: { foto_profil: req.file.path.split(path.sep).join('/') },
+    data: { foto_profil_data: req.file.buffer, foto_profil_mimetype: req.file.mimetype },
   })
   res.json(updated)
+}
+
+export async function getFoto(req, res) {
+  const siswa = await prisma.siswa.findUnique({
+    where: { id_siswa: req.params.id },
+    select: { foto_profil_data: true, foto_profil_mimetype: true },
+  })
+  if (!siswa?.foto_profil_data) return res.status(404).end()
+
+  res.set('Content-Type', siswa.foto_profil_mimetype)
+  res.send(Buffer.from(siswa.foto_profil_data))
 }
 
 export async function remove(req, res) {

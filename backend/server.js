@@ -9,6 +9,7 @@ import babRoutes from './src/routes/bab.routes.js'
 import dashboardRoutes from './src/routes/dashboard.routes.js'
 import configRoutes from './src/routes/config.routes.js'
 import jadwalRoutes from './src/routes/jadwal.routes.js'
+import filesRoutes from './src/routes/files.routes.js'
 
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled rejection (server tetap jalan):', err)
@@ -30,12 +31,12 @@ function corsOrigin(origin, callback) {
 
 app.use(cors({ origin: corsOrigin }))
 app.use(express.json())
-app.use('/uploads', express.static('uploads'))
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend is running' })
 })
 
+app.use('/api', filesRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/siswa', siswaRoutes)
 app.use('/api/bab', babRoutes)

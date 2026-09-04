@@ -18,7 +18,8 @@ export default function StudentListPanel({ siswaList, selectedId, onSelect, onAd
             onClick={() => onSelect(s.id_siswa)}
           >
             <StudentAvatar
-              foto_profil={s.foto_profil}
+              id_siswa={s.id_siswa}
+              foto_profil_mimetype={s.foto_profil_mimetype}
               nama={s.nama}
               size={36}
               className="student-list-avatar"

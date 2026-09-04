@@ -1,13 +1,13 @@
-import { assetUrl } from '../api/client'
+import { siswaFotoUrl } from '../api/client'
 import './StudentAvatar.css'
 
-export default function StudentAvatar({ foto_profil, nama, size, className = '' }) {
+export default function StudentAvatar({ id_siswa, foto_profil_mimetype, nama, size, className = '' }) {
   const style = size ? { width: size, height: size } : undefined
 
-  if (foto_profil) {
+  if (foto_profil_mimetype) {
     return (
       <img
-        src={assetUrl(foto_profil)}
+        src={siswaFotoUrl(id_siswa)}
         alt={nama}
         className={`student-avatar student-avatar-photo ${className}`}
         style={style}

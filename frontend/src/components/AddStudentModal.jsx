@@ -62,7 +62,7 @@ export default function AddStudentModal({ onClose, onCreated }) {
               {fotoPreview ? (
                 <img src={fotoPreview} alt="Preview" className="add-student-foto-preview" />
               ) : (
-                <StudentAvatar foto_profil={null} nama={form.nama || '?'} size={56} />
+                <StudentAvatar nama={form.nama || '?'} size={56} />
               )}
               <label className="add-student-foto-btn">
                 Pilih Foto

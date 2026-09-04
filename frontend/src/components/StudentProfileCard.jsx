@@ -74,7 +74,13 @@ export default function StudentProfileCard({ siswa, onUpdated }) {
 
       <div className="profile-body">
         <div className="profile-avatar-wrap">
-          <StudentAvatar foto_profil={siswa.foto_profil} nama={siswa.nama} size={64} className="profile-avatar" />
+          <StudentAvatar
+            id_siswa={siswa.id_siswa}
+            foto_profil_mimetype={siswa.foto_profil_mimetype}
+            nama={siswa.nama}
+            size={64}
+            className="profile-avatar"
+          />
           <button
             type="button"
             className="profile-avatar-edit"

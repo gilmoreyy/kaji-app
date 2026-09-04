@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { apiFetch } from '../api/client'
+import { apiFetch, assignmentFileUrl } from '../api/client'
 import { getScoreColor } from '../constants/score'
 import './ClassDetail.css'
 
@@ -332,9 +332,9 @@ function AssignmentCard({ jadwal, isHistory, onUploaded }) {
     }
   }
 
-  const isDummy = !jadwal.assignment_path && isHistory
-  const fileUrl = jadwal.assignment_path
-    ? `/${jadwal.assignment_path}`
+  const isDummy = !jadwal.assignment_nama_file && isHistory
+  const fileUrl = jadwal.assignment_nama_file
+    ? assignmentFileUrl(jadwal.id_siswa, jadwal.id_jadwal)
     : isDummy
       ? DUMMY_ASSIGNMENT_PATH
       : null
