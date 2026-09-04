@@ -31,6 +31,49 @@ git push -u origin main
 
 ---
 
+## 0a. Setup Nameserver & DNS di Rumah Web
+
+**Nameserver domain `sistemkaji.com` tetap pakai default Rumah Web** (biasanya
+`ns1.rumahweb.com` / `ns2.rumahweb.com`, cek nama persisnya di member area
+kamu) — **jangan** diganti ke nameserver Vercel atau Render.
+
+Alasannya: Vercel dan Render mendukung koneksi domain lewat DNS record biasa
+(A/CNAME), jadi cukup nambah record di Zone Editor Rumah Web. Kalau nameserver
+dipindah ke Vercel, subdomain `api.sistemkaji.com` yang menunjuk ke Render
+jadi tidak bisa diatur dari sana — lebih ribet. Dengan nameserver tetap di
+Rumah Web, apex domain (ke Vercel) dan subdomain `api.` (ke Render) bisa
+dikelola dari satu tempat.
+
+**Cara buka DNS Zone Editor di Rumah Web:**
+
+1. Login ke [member area Rumah Web](https://my.rumahweb.com) (atau cPanel,
+   tergantung jenis layanan hosting/domain kamu).
+2. Cari menu **Domain** → pilih `sistemkaji.com` → **DNS Management** /
+   **Zone Editor** / **Kelola DNS Record** (nama menunya bisa beda tergantung
+   panel yang dipakai).
+3. Pastikan **Nameserver** domain masih default Rumah Web (tab terpisah dari
+   DNS Management, biasanya di tab **Nameserver** — cukup dicek, tidak perlu
+   diubah).
+4. Di Zone Editor, tambahkan record berikut (nilai persis untuk Vercel/Render
+   dilihat lagi dari dashboard masing-masing saat kamu add custom domain,
+   lihat langkah 1a dan 2a):
+
+   | Type | Host/Name | Value/Target | Untuk |
+   |---|---|---|---|
+   | A | `@` | `76.76.21.21` | Frontend (Vercel apex) |
+   | CNAME | `www` | `cname.vercel-dns.com` | Frontend (opsional, kalau pakai www) |
+   | CNAME | `api` | `<nama-service>.onrender.com` | Backend (Render) |
+
+5. Simpan. Propagasi DNS biasanya 5 menit – beberapa jam (kadang sampai 24
+   jam). Cek status dengan:
+   ```bash
+   nslookup sistemkaji.com
+   nslookup api.sistemkaji.com
+   ```
+   Bandingkan hasilnya dengan target yang diminta Vercel/Render di dashboard.
+
+---
+
 ## 1. Deploy Backend ke Render
 
 1. Render Dashboard → **New** → **Web Service** → connect ke repo GitHub ini.
