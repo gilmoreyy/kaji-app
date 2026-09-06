@@ -21,3 +21,19 @@
   font-weight: 700;
   color: var(--color-primary);
 }
+
+.sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  color: inherit;
+  cursor: pointer;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(47, 96, 179, 0.08);
+}

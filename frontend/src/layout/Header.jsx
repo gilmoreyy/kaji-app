@@ -3,7 +3,7 @@ import { apiFetch } from '../api/client'
 import SnbtCountdown from '../components/SnbtCountdown'
 import './Header.css'
 
-export default function Header({ title }) {
+export default function Header({ title, onToggleSidebar }) {
   const [snbtDate, setSnbtDate] = useState(null)
 
   useEffect(() => {
@@ -15,7 +15,14 @@ export default function Header({ title }) {
   return (
     <header className="app-header">
       <div className="app-header-title">
-        <ToggleIcon />
+        <button
+          type="button"
+          className="sidebar-toggle-btn"
+          onClick={onToggleSidebar}
+          aria-label="Toggle sidebar"
+        >
+          <ToggleIcon />
+        </button>
         <h1>{title}</h1>
       </div>
       <SnbtCountdown targetDate={snbtDate} />

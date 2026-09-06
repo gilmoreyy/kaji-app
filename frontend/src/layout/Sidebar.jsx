@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import logo from '../assets/logo.png'
+import { useAuth } from '../context/AuthContext'
 import './Sidebar.css'
 
 const NAV_ITEMS = [
@@ -10,9 +11,11 @@ const NAV_ITEMS = [
   { to: '/setting', label: 'Setting', icon: GearIcon },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed = false }) {
+  const { logout } = useAuth()
+
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${collapsed ? ' collapsed' : ''}`}>
       <img src={logo} alt="KAJI" className="sidebar-logo" />
       <nav className="sidebar-nav">
         {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
@@ -27,7 +30,21 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
+      <button type="button" className="sidebar-link sidebar-logout" onClick={logout}>
+        <LogoutIcon />
+        <span>Logout</span>
+      </button>
     </aside>
+  )
+}
+
+function LogoutIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 16l4-4-4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M20 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   )
 }
 
