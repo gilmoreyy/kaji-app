@@ -1,4 +1,4 @@
-# Panduan Deploy KAJI (Render + Vercel + Domain sistemkaji.com)
+# Panduan Deploy KAJI (Railway + Vercel + Domain sistemkaji.com)
 
 Domain: **sistemkaji.com** (dibeli di Rumah Web)
 
@@ -6,13 +6,13 @@ Domain: **sistemkaji.com** (dibeli di Rumah Web)
 
 ```
 sistemkaji.com          -> Vercel (frontend, React + Vite)
-api.sistemkaji.com      -> Render (backend, Express + Prisma)
+api.sistemkaji.com      -> Railway (backend, Express + Prisma)
                             -> Neon Postgres (database)
 ```
 
 Backend dan frontend di-deploy terpisah. Domain utama dipakai untuk frontend,
 subdomain `api.` dipakai untuk backend supaya URL API rapi dan tidak terikat
-ke `*.onrender.com`.
+ke `*.up.railway.app`.
 
 ---
 
@@ -20,7 +20,8 @@ ke `*.onrender.com`.
 
 - [ ] Semua perubahan sudah di-commit
 - [ ] Repo sudah punya remote GitHub (`git remote -v` tidak kosong)
-- [ ] Sudah login ke [render.com](https://render.com) dan [vercel.com](https://vercel.com) (bisa pakai akun GitHub)
+- [ ] Sudah login ke [railway.app](https://railway.app) dan [vercel.com](https://vercel.com) (bisa pakai akun GitHub)
+- [ ] Railway butuh kartu pembayaran terpasang di akun (Trial plan gratis punya kredit terbatas dan tidak bisa pasang custom domain kalau kreditnya habis) — set ke plan **Hobby** ($5/bulan usage-based) sebelum lanjut
 - [ ] Akses ke panel domain Rumah Web (untuk atur DNS)
 
 ```bash
@@ -35,13 +36,13 @@ git push -u origin main
 
 **Nameserver domain `sistemkaji.com` tetap pakai default Rumah Web** (biasanya
 `ns1.rumahweb.com` / `ns2.rumahweb.com`, cek nama persisnya di member area
-kamu) — **jangan** diganti ke nameserver Vercel atau Render.
+kamu) — **jangan** diganti ke nameserver Vercel atau Railway.
 
-Alasannya: Vercel dan Render mendukung koneksi domain lewat DNS record biasa
+Alasannya: Vercel dan Railway mendukung koneksi domain lewat DNS record biasa
 (A/CNAME), jadi cukup nambah record di Zone Editor Rumah Web. Kalau nameserver
-dipindah ke Vercel, subdomain `api.sistemkaji.com` yang menunjuk ke Render
+dipindah ke Vercel, subdomain `api.sistemkaji.com` yang menunjuk ke Railway
 jadi tidak bisa diatur dari sana — lebih ribet. Dengan nameserver tetap di
-Rumah Web, apex domain (ke Vercel) dan subdomain `api.` (ke Render) bisa
+Rumah Web, apex domain (ke Vercel) dan subdomain `api.` (ke Railway) bisa
 dikelola dari satu tempat.
 
 **Cara buka DNS Zone Editor di Rumah Web:**
@@ -54,7 +55,7 @@ dikelola dari satu tempat.
 3. Pastikan **Nameserver** domain masih default Rumah Web (tab terpisah dari
    DNS Management, biasanya di tab **Nameserver** — cukup dicek, tidak perlu
    diubah).
-4. Di Zone Editor, tambahkan record berikut (nilai persis untuk Vercel/Render
+4. Di Zone Editor, tambahkan record berikut (nilai persis untuk Vercel/Railway
    dilihat lagi dari dashboard masing-masing saat kamu add custom domain,
    lihat langkah 1a dan 2a):
 
@@ -62,7 +63,7 @@ dikelola dari satu tempat.
    |---|---|---|---|
    | A | `@` | `76.76.21.21` | Frontend (Vercel apex) |
    | CNAME | `www` | `cname.vercel-dns.com` | Frontend (opsional, kalau pakai www) |
-   | CNAME | `api` | `<nama-service>.onrender.com` | Backend (Render) |
+   | CNAME | `api` | `<target-yang-diberikan-railway>` | Backend (Railway, lihat 1a) |
 
 5. Simpan. Propagasi DNS biasanya 5 menit – beberapa jam (kadang sampai 24
    jam). Cek status dengan:
@@ -70,41 +71,51 @@ dikelola dari satu tempat.
    nslookup sistemkaji.com
    nslookup api.sistemkaji.com
    ```
-   Bandingkan hasilnya dengan target yang diminta Vercel/Render di dashboard.
+   Bandingkan hasilnya dengan target yang diminta Vercel/Railway di dashboard.
 
 ---
 
-## 1. Deploy Backend ke Render
+## 1. Deploy Backend ke Railway
 
-1. Render Dashboard → **New** → **Web Service** → connect ke repo GitHub ini.
-2. Isi konfigurasi:
-   | Setting | Nilai |
-   |---|---|
-   | Root Directory | `backend` |
-   | Runtime | Node |
-   | Build Command | `npm install && npx prisma migrate deploy` |
-   | Start Command | `npm start` |
-   | Instance Type | Free / sesuai kebutuhan |
-
-3. Tambahkan Environment Variables (Render → tab **Environment**):
+1. Railway Dashboard → **New Project** → **Deploy from GitHub repo** → pilih repo ini.
+2. Railway otomatis mendeteksi Node lewat Nixpacks. Karena repo ini monorepo
+   (backend + frontend jadi satu repo), atur root directory service:
+   - Buka service yang baru dibuat → tab **Settings** → **Source** →
+     **Root Directory** → isi `backend`.
+3. Build & start command **tidak perlu diisi manual** — Railway otomatis
+   jalankan `npm install` (yang juga trigger `prisma generate` lewat
+   `postinstall`) lalu `npm start`. Script `start` di `backend/package.json`
+   sudah mencakup `prisma migrate deploy` sebelum server jalan, jadi migrasi
+   database ikut jalan otomatis tiap deploy.
+4. Tambahkan Environment Variables (service → tab **Variables**):
    | Key | Value |
    |---|---|
    | `DATABASE_URL` | connection string Neon Postgres (sama seperti di `backend/.env`) |
    | `JWT_SECRET` | string acak panjang (boleh reuse yang di `.env`, atau generate baru khusus production) |
    | `FRONTEND_URL` | `https://sistemkaji.com` (nanti bisa ditambah `,https://www.sistemkaji.com` — pisahkan koma) |
-   | `PORT` | tidak perlu diisi, Render set otomatis |
 
-4. Deploy. Tunggu build selesai, lalu cek `https://<nama-service>.onrender.com/api/health` harus balas `{"status":"ok"}`.
+   > Jangan set `PORT` manual — Railway inject otomatis, dan `server.js` sudah
+   > baca `process.env.PORT` serta bind ke `0.0.0.0` (wajib supaya Railway bisa
+   > mengarahkan traffic ke container).
+5. Railway otomatis deploy setelah variable disimpan. Setelah build selesai,
+   cek domain publik sementara (**Settings → Networking → Generate Domain**,
+   bentuknya `<nama>.up.railway.app`) lalu tes
+   `https://<nama>.up.railway.app/api/health` harus balas `{"status":"ok"}`.
 
-### 1a. Sambungkan `api.sistemkaji.com` ke Render
+### 1a. Sambungkan `api.sistemkaji.com` ke Railway
 
-1. Di service Render → tab **Settings** → **Custom Domains** → **Add Custom Domain** → masukkan `api.sistemkaji.com`.
-2. Render akan menampilkan target CNAME, biasanya berupa `<nama-service>.onrender.com`. Catat nilai persisnya dari dashboard (bisa berbeda-beda).
-3. Buka panel DNS Rumah Web untuk domain `sistemkaji.com` (biasanya di menu **DNS Management** / **Zone Editor** di cPanel/CloudLinux Rumah Web) dan tambahkan record:
+1. Di service Railway → tab **Settings → Networking → Custom Domain** →
+   masukkan `api.sistemkaji.com` → **Add Domain**.
+2. Railway akan menampilkan target CNAME unik (bukan `up.railway.app` biasa,
+   tapi subdomain khusus untuk domain ini). Catat nilai persisnya dari
+   dashboard.
+3. Buka panel DNS Rumah Web untuk domain `sistemkaji.com` dan tambahkan record:
    | Type | Host/Name | Value/Target |
    |---|---|---|
-   | CNAME | `api` | `<nama-service>.onrender.com` (dari Render) |
-4. Tunggu propagasi DNS (bisa 5 menit – beberapa jam). Render akan otomatis issue SSL certificate begitu DNS terverifikasi — status di dashboard berubah jadi "Verified".
+   | CNAME | `api` | `<target-dari-railway>` (dari langkah 2) |
+4. Tunggu propagasi DNS (bisa 5 menit – beberapa jam). Railway akan otomatis
+   issue SSL certificate begitu DNS terverifikasi — status di dashboard
+   berubah jadi "Active"/centang hijau.
 
 ---
 
@@ -146,7 +157,7 @@ dikelola dari satu tempat.
 4. Di panel DNS Rumah Web, tambahkan record sesuai yang diminta Vercel di langkah 2.
 5. Tunggu propagasi DNS, Vercel otomatis provision SSL (Let's Encrypt) begitu DNS terverifikasi.
 
-> Catatan: kalau nameserver domain masih default punya Rumah Web, cukup tambah record di Zone Editor mereka — tidak perlu pindah nameserver ke Vercel/Render.
+> Catatan: kalau nameserver domain masih default punya Rumah Web, cukup tambah record di Zone Editor mereka — tidak perlu pindah nameserver ke Vercel/Railway.
 
 ---
 
@@ -154,7 +165,7 @@ dikelola dari satu tempat.
 
 Setelah `sistemkaji.com` dan `api.sistemkaji.com` sudah live dan SSL aktif:
 
-1. **Render** → update `FRONTEND_URL` jadi `https://sistemkaji.com,https://www.sistemkaji.com` (sertakan semua origin yang dipakai) → redeploy backend.
+1. **Railway** → update `FRONTEND_URL` jadi `https://sistemkaji.com,https://www.sistemkaji.com` (sertakan semua origin yang dipakai) → Railway otomatis redeploy saat variable disimpan.
 2. **Vercel** → pastikan `VITE_API_URL=https://api.sistemkaji.com` sudah benar → redeploy frontend (Vercel perlu rebuild karena `VITE_API_URL` di-inject saat build, bukan runtime).
 
 ---
@@ -168,6 +179,7 @@ Setelah `sistemkaji.com` dan `api.sistemkaji.com` sudah live dan SSL aktif:
 - [ ] Upload foto profil siswa berhasil, foto tampil (cek endpoint `/api/siswa/:id/foto`)
 - [ ] Upload assignment PDF berhasil, bisa dibuka lagi
 - [ ] Data yang dibuat nge-persist setelah backend redeploy (bukti file disimpan di Postgres, bukan disk)
+- [ ] Lihat log deploy Railway sekali — pastikan baris `prisma migrate deploy` sukses jalan tanpa error sebelum "Backend running on port ..."
 
 ---
 
@@ -175,9 +187,10 @@ Setelah `sistemkaji.com` dan `api.sistemkaji.com` sudah live dan SSL aktif:
 
 | Gejala | Kemungkinan Penyebab | Fix |
 |---|---|---|
-| CORS error di browser console | `FRONTEND_URL` di Render belum termasuk origin yang dipakai | Tambahkan origin persis (termasuk `https://` dan tanpa trailing slash) ke `FRONTEND_URL`, redeploy |
+| CORS error di browser console | `FRONTEND_URL` di Railway belum termasuk origin yang dipakai | Tambahkan origin persis (termasuk `https://` dan tanpa trailing slash) ke `FRONTEND_URL` di tab Variables |
 | Refresh route selain `/` → 404 | `vercel.json` rewrite tidak kepakai / root directory salah | Pastikan `frontend/vercel.json` ada dan Root Directory Vercel = `frontend` |
-| Data lama hilang setelah redeploy | Masih pakai `multer.diskStorage` / folder `uploads` lokal | Pastikan migrasi `file_storage_in_db` sudah jalan (`prisma migrate deploy`) di production |
+| Data lama hilang setelah redeploy | Masih pakai `multer.diskStorage` / folder `uploads` lokal | Pastikan migrasi `file_storage_in_db` sudah jalan (`prisma migrate deploy`, otomatis lewat script `start`) di production |
 | Login gagal padahal kredensial benar | `JWT_SECRET` beda antara saat token dibuat vs sekarang (misal habis redeploy dengan secret baru) | Set `JWT_SECRET` sekali di awal dan jangan diubah-ubah tanpa alasan |
-| Domain belum aktif setelah 24 jam | Record DNS salah / masih di-cache | Cek dengan `nslookup sistemkaji.com` dan `nslookup api.sistemkaji.com`, bandingkan dengan target yang diminta Vercel/Render |
+| Deploy Railway gagal / restart loop | Root Directory service belum diset ke `backend`, atau `DATABASE_URL` salah/belum diisi | Cek tab **Deployments → Logs**; pastikan Root Directory = `backend` dan semua env var di langkah 1 terisi |
+| Domain belum aktif setelah 24 jam | Record DNS salah / masih di-cache | Cek dengan `nslookup sistemkaji.com` dan `nslookup api.sistemkaji.com`, bandingkan dengan target yang diminta Vercel/Railway |
 | Perubahan `VITE_API_URL` tidak ke-apply | Vite inject env var saat **build**, bukan saat runtime | Redeploy ulang project di Vercel setelah ubah env var |
