@@ -1,7 +1,7 @@
 import multer from 'multer'
 import prisma from '../config/db.js'
 import { assertOwnership } from './siswa.controller.js'
-import { generateRekomendasi } from '../services/recommendation.service.js'
+import { generateRekomendasi, getBabSelanjutnya } from '../services/recommendation.service.js'
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -52,14 +52,22 @@ export async function create(req, res) {
     return res.status(400).json({ message: 'tanggal_pertemuan dan waktu_pertemuan wajib diisi' })
   }
 
-  const rekomendasi = await generateRekomendasi(siswa.id_siswa)
+  // generateRekomendasi hanya mengurutkan prioritas (dipakai utk daftar
+  // review); bab_selanjutnya dari getBabSelanjutnya adalah yang menegakkan
+  // aturan "merah -> tetap di bab itu, kuning/hijau -> boleh lanjut", jadi itu
+  // yang menentukan id_bab jadwal baru. Fallback ke top3 prioritas hanya kalau
+  // semua bab sudah hijau tuntas (getBabSelanjutnya mengembalikan null).
+  const [rekomendasi, babSelanjutnya] = await Promise.all([
+    generateRekomendasi(siswa.id_siswa),
+    getBabSelanjutnya(siswa.id_siswa),
+  ])
 
   const jadwal = await prisma.jadwal_Pertemuan.create({
     data: {
       id_siswa: siswa.id_siswa,
       tanggal_pertemuan: new Date(tanggal_pertemuan),
       waktu_pertemuan,
-      id_bab: rekomendasi[0]?.id_bab ?? null,
+      id_bab: babSelanjutnya?.id_bab ?? rekomendasi[0]?.id_bab ?? null,
     },
   })
   res.status(201).json(jadwal)

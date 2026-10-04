@@ -1,5 +1,5 @@
 import prisma from '../config/db.js'
-import { generateRekomendasi } from '../services/recommendation.service.js'
+import { generateRekomendasi, getBabSelanjutnya } from '../services/recommendation.service.js'
 import { SNBT_DATE } from '../config/constants.js'
 
 const UPCOMING_LIMIT = 10
@@ -69,7 +69,10 @@ export async function overview(req, res) {
 
   const upcoming_class = await Promise.all(
     jadwalMendatang.map(async (j) => {
-      const rekomendasi = await generateRekomendasi(j.id_siswa)
+      const [rekomendasi, babSelanjutnya] = await Promise.all([
+        generateRekomendasi(j.id_siswa),
+        getBabSelanjutnya(j.id_siswa),
+      ])
       return {
         id_jadwal: j.id_jadwal,
         id_siswa: j.id_siswa,
@@ -77,7 +80,7 @@ export async function overview(req, res) {
         tanggal_pertemuan: j.tanggal_pertemuan,
         waktu_pertemuan: j.waktu_pertemuan,
         meeting_number: meetingNumberByJadwalId.get(j.id_jadwal),
-        topik: rekomendasi[0]?.nama_bab ?? null,
+        topik: babSelanjutnya?.nama_bab ?? rekomendasi[0]?.nama_bab ?? null,
         rekomendasi,
       }
     }),
